@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Familienkalender</title>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet"/>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+  }
+  header {
+    background: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
+  #login {
+    text-align: center;
+    margin-top: 50px;
+  }
+  #calendar {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Familienkalender</h1>
+</header>
+
+<div id="login">
+  <h2>Bitte Familiencode eingeben:</h2>
+  <input type="password" id="codeInput" placeholder="Familiencode"/>
+  <button onclick="checkCode()">Login</button>
+  <p id="error" style="color:red;"></p>
+</div>
+
+<div id="calendar" style="display:none;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script>
+const FAMILY_CODE = "FAMILYHOLL";
+
+// Mitglieder & Farben
+const members = {
+  "Mama": "#FF6F61",
+  "Papa": "#6B5B95",
+  "Elaine": "#FF69B4",
+  "Emily": "#F7CAC9",
+  "Jason": "#92A8D1",
+  "Sophia": "#F7786B"
+};
+
+function checkCode() {
+  const input = document.getElementById("codeInput").value;
+  if (input === FAMILY_CODE) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("calendar").style.display = "block";
+    initCalendar();
+  } else {
+    document.getElementById("error").innerText = "Falscher Code!";
+  }
+}
+
+function initCalendar() {
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    selectable: true,
+    editable: true,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    events: [],
+    select: function(info) {
+      const name = prompt("Wer ist der Termininhaber? (Mama, Papa, Elaine, Emily, Jason, Sophia)");
+      if (name && members[name]) {
+        const title = prompt("Titel des Termins:");
+        if (title) {
+          calendar.addEvent({
+            title: name + ": " + title,
+            start: info.start,
+            end: info.end,
+            color: members[name]
+          });
+        }
+      } else {
+        alert("Name ungültig oder nicht in der Liste.");
+      }
+      calendar.unselect();
+    },
+    eventClick: function(info) {
+      if (confirm("Diesen Termin löschen?")) {
+        info.event.remove();
+      }
+    }
+  });
+  calendar.render();
+}
+</script>
+</body>
+</html>
